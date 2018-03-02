@@ -10,7 +10,10 @@ class App extends React.Component {
       username: '',
       password: '',
       user: null,
-      blogs: []
+      blogs: [],
+      newBlogTitle: '',
+      newBlogAuthor: '',
+      newBlogUrl: ''
     }
   }
 
@@ -20,10 +23,10 @@ class App extends React.Component {
     )
 
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
-    console.log(loggedUserJSON)
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       this.setState({ user })
+      blogService.setToken(user.token)
     }
   }
 
@@ -35,9 +38,9 @@ class App extends React.Component {
         password: this.state.password
       })
 
+      window.localStorage.setItem('loggedUser', JSON.stringify(user))
       blogService.setToken(user.token)
       this.setState({ username: '', password: '', user })
-      window.localStorage.setItem('loggedUser', JSON.stringify(user))
     } catch (exception) {
       this.setState({ error: 'Virheellinen käyttäjätunnus tai salasana' })
     }
@@ -79,6 +82,47 @@ class App extends React.Component {
     </div>
   )
 
+  blogForm = () => (
+    <div>
+      <h3>create new</h3>
+      <form onSubmit={this.addBlog}>
+        title: <input type="text" name="newBlogTitle" value={this.state.newBlogTitle} onChange={this.handleBlogFieldChange} />
+        author:<input type="text" name="newBlogAuthor" value={this.state.newBlogAuthor} onChange={this.handleBlogFieldChange} />
+        url: <input type="text" name="newBlogUrl" value={this.state.newBlogUrl} onChange={this.handleBlogFieldChange} />
+        <button type="submit">uusi blogi</button>
+      </form>
+    </div>
+  )
+
+  addBlog = (event) => {
+    event.preventDefault()
+    const blogObject = {
+      title: this.state.newBlogTitle,
+      url: this.state.newBlogUrl,
+      author: this.state.newBlogAuthor
+    }
+
+    blogService.create(blogObject)
+      .then(blogObject => this.setState({
+        newBlogTitle: '',
+        newBlogAuthor: '',
+        newBlogUrl: '',
+        blogs: this.state.blogs.concat(blogObject)
+      }))
+  }
+
+  handleBlogFieldChange = (event) => {
+    if (event.target.name === 'newBlogTitle') {
+      this.setState({ newBlogTitle: event.target.value })
+    }
+    if (event.target.name === 'newBlogAuthor') {
+      this.setState({ newBlogAuthor: event.target.value })
+    }
+    if (event.target.name === 'newBlogUrl') {
+      this.setState({ newBlogUrl: event.target.value })
+    }
+  }
+
   handleLoginFieldChange = (event) => {
     if (event.target.name === 'password') {
       this.setState({ password: event.target.value })
@@ -96,6 +140,7 @@ class App extends React.Component {
         {this.state.user === null ? this.loginForm() :
           <div>
             <p>{this.state.user.name} logged in </p><button onClick={() => window.localStorage.removeItem('loggedUser')}>logout</button>
+            {this.blogForm()}
             {this.blogList()}
           </div>
         }
