@@ -18,6 +18,13 @@ class App extends React.Component {
     blogService.getAll().then(blogs =>
       this.setState({ blogs })
     )
+
+    const loggedUserJSON = window.localStorage.getItem('loggedUser')
+    console.log(loggedUserJSON)
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      this.setState({ user })
+    }
   }
 
   login = async (event) => {
@@ -28,7 +35,9 @@ class App extends React.Component {
         password: this.state.password
       })
 
+      blogService.setToken(user.token)
       this.setState({ username: '', password: '', user })
+      window.localStorage.setItem('loggedUser', JSON.stringify(user))
     } catch (exception) {
       this.setState({ error: 'Virheellinen käyttäjätunnus tai salasana' })
     }
@@ -86,13 +95,13 @@ class App extends React.Component {
       <div>
         {this.state.user === null ? this.loginForm() :
           <div>
-            <p>{this.state.user.name} logged in </p>
+            <p>{this.state.user.name} logged in </p><button onClick={() => window.localStorage.removeItem('loggedUser')}>logout</button>
             {this.blogList()}
           </div>
         }
       </div>
-      );
-    }
+    );
   }
-  
-  export default App;
+}
+
+export default App;
