@@ -17,7 +17,8 @@ class App extends React.Component {
       newBlogTitle: '',
       newBlogAuthor: '',
       newBlogUrl: '',
-      error: null
+      error: null,
+      loginVisible: false
     }
   }
 
@@ -102,13 +103,21 @@ class App extends React.Component {
     }
   }
 
-
+  handleLoginVisibilityChange = () => {
+    this.setState({loginVisible: !this.state.loginVisible})
+  }
 
   render() {
     return (
       <div>
         <Notification message={this.state.error} />
-        {this.state.user === null ? <LoginForm username={this.state.username} password={this.state.password} handleSubmit={this.login} handleChange={this.handleLoginFieldChange} /> :
+        {this.state.user === null ?
+          <LoginForm username={this.state.username}
+            password={this.state.password}
+            handleSubmit={this.login}
+            handleChange={this.handleLoginFieldChange}
+            loginVisible={this.state.loginVisible}
+            loginVisibleChange={this.handleLoginVisibilityChange} /> :
           <div>
             <p>{this.state.user.name} logged in </p><button onClick={() => window.localStorage.removeItem('loggedUser')}>logout</button>
             <BlogForm newBlogAuthor={this.state.newBlogAuthor}
@@ -116,7 +125,7 @@ class App extends React.Component {
               newBlogTitle={this.state.newBlogTitle}
               handleChange={this.handleBlogFieldChange}
               handleSubmit={this.addBlog} />
-            <BlogList blogs={this.state.blogs}/>
+            <BlogList blogs={this.state.blogs} />
           </div>
         }
       </div>
