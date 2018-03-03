@@ -13,12 +13,15 @@ const setToken = (newToken) => {
 }
 
 const create = async (newObject) => {
-  const config = {
-    headers: { 'Authorization': token }
-  }
+  try {
+    const config = {
+      headers: { 'Authorization': token }
+    }
 
-  const response = await axios.post(baseUrl, newObject, config)
-  return response.data
+    const response = await axios.post(baseUrl, newObject, config)
+    return response.data
+  } catch (exception) {
+  }
 }
 
 const update = (id, newObject) => {

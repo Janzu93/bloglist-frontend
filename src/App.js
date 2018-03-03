@@ -2,6 +2,7 @@ import React from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Notification from './components/Notification'
 
 class App extends React.Component {
   constructor(props) {
@@ -13,7 +14,8 @@ class App extends React.Component {
       blogs: [],
       newBlogTitle: '',
       newBlogAuthor: '',
-      newBlogUrl: ''
+      newBlogUrl: '',
+      error: null
     }
   }
 
@@ -40,7 +42,7 @@ class App extends React.Component {
 
       window.localStorage.setItem('loggedUser', JSON.stringify(user))
       blogService.setToken(user.token)
-      this.setState({ username: '', password: '', user })
+      this.setState({ username: '', password: '', user, notification: `Olet kirjautunut käyttäjänä ${user.username}` })
     } catch (exception) {
       this.setState({ error: 'Virheellinen käyttäjätunnus tai salasana' })
     }
@@ -102,12 +104,21 @@ class App extends React.Component {
       author: this.state.newBlogAuthor
     }
 
+    if (!blogObject.title || !blogObject.url) {
+      this.setState({ error: 'Title ja Url kenttien pitää sisältää jotain' })
+      setTimeout(() => {
+        this.setState({ error: null })
+      }, 5000)
+      return
+    }
+
     blogService.create(blogObject)
       .then(blogObject => this.setState({
         newBlogTitle: '',
         newBlogAuthor: '',
         newBlogUrl: '',
-        blogs: this.state.blogs.concat(blogObject)
+        blogs: this.state.blogs.concat(blogObject),
+        error: 'Blogin lisäys onnistui'
       }))
   }
 
@@ -137,6 +148,7 @@ class App extends React.Component {
   render() {
     return (
       <div>
+        <Notification message={this.state.error} />
         {this.state.user === null ? this.loginForm() :
           <div>
             <p>{this.state.user.name} logged in </p><button onClick={() => window.localStorage.removeItem('loggedUser')}>logout</button>
@@ -145,7 +157,7 @@ class App extends React.Component {
           </div>
         }
       </div>
-    );
+    )
   }
 }
 
