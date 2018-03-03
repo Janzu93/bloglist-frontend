@@ -4,24 +4,32 @@ const initialState = {
   bad: 0
 }
 
-const counterReducer = (state = initialState, action) => {
+const counterReducer = (state, action) => {
+
+  let newState
+  if (state === undefined) {
+    newState = initialState
+  } else {
+    newState = Object.assign({}, state)
+  }
+
   switch (action.type) {
     case 'GOOD':
-      state.good += 1
-      return state
+      newState.good += 1
+      return newState
     case 'OK':
-      state.ok += 1
-      return state
+      newState.ok += 1
+      return newState
     case 'BAD':
-      state.bad += 1
-      return state
+      newState.bad += 1
+      return newState
     case 'ZERO':
-      state.good = 0
-      state.bad = 0
-      state.ok = 0
-      return state
+      newState.good = 0
+      newState.bad = 0
+      newState.ok = 0
+      return newState
     default:
-      return state
+      return newState
   }
 }
 
