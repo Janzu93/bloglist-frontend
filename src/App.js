@@ -5,6 +5,7 @@ import LoginForm from './components/loginForm'
 import BlogForm from './components/blogForm'
 import BlogList from './components/blogList'
 import Notification from './components/Notification'
+import Togglable from './components/togglable'
 
 class App extends React.Component {
   constructor(props) {
@@ -104,7 +105,7 @@ class App extends React.Component {
   }
 
   handleLoginVisibilityChange = () => {
-    this.setState({loginVisible: !this.state.loginVisible})
+    this.setState({ loginVisible: !this.state.loginVisible })
   }
 
   render() {
@@ -112,12 +113,14 @@ class App extends React.Component {
       <div>
         <Notification message={this.state.error} />
         {this.state.user === null ?
-          <LoginForm username={this.state.username}
-            password={this.state.password}
-            handleSubmit={this.login}
-            handleChange={this.handleLoginFieldChange}
-            loginVisible={this.state.loginVisible}
-            loginVisibleChange={this.handleLoginVisibilityChange} /> :
+          <Togglable buttonLabel="kirjaudu">
+            <LoginForm username={this.state.username}
+              password={this.state.password}
+              handleSubmit={this.login}
+              handleChange={this.handleLoginFieldChange}
+              loginVisible={this.state.loginVisible}
+              loginVisibleChange={this.handleLoginVisibilityChange} />
+          </Togglable> :
           <div>
             <p>{this.state.user.name} logged in </p><button onClick={() => window.localStorage.removeItem('loggedUser')}>logout</button>
             <BlogForm newBlogAuthor={this.state.newBlogAuthor}
