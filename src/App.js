@@ -1,7 +1,9 @@
 import React from 'react'
-import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import LoginForm from './components/loginForm'
+import BlogForm from './components/blogForm'
+import BlogList from './components/blogList'
 import Notification from './components/Notification'
 
 class App extends React.Component {
@@ -51,50 +53,7 @@ class App extends React.Component {
     }, 5000)
   }
 
-  loginForm = () => (
-    <div>
-      <h2>Kirjaudu</h2>
-      <form onSubmit={this.login}>
-        <div>käyttäjätunnus:
-        <input
-            type="text"
-            name="username"
-            value={this.state.username}
-            onChange={this.handleLoginFieldChange}
-          />
-        </div>
-        <div>salasana:
-          <input
-            type="password"
-            name="password"
-            value={this.state.password}
-            onChange={this.handleLoginFieldChange} />
-        </div>
-        <button type="submit">kirjaudu</button>
-      </form>
-    </div>
-  )
 
-  blogList = () => (
-    <div>
-      <h2>blogs</h2>
-      {this.state.blogs.map(blog =>
-        <Blog key={blog._id} blog={blog} />
-      )}
-    </div>
-  )
-
-  blogForm = () => (
-    <div>
-      <h3>create new</h3>
-      <form onSubmit={this.addBlog}>
-        title: <input type="text" name="newBlogTitle" value={this.state.newBlogTitle} onChange={this.handleBlogFieldChange} />
-        author:<input type="text" name="newBlogAuthor" value={this.state.newBlogAuthor} onChange={this.handleBlogFieldChange} />
-        url: <input type="text" name="newBlogUrl" value={this.state.newBlogUrl} onChange={this.handleBlogFieldChange} />
-        <button type="submit">uusi blogi</button>
-      </form>
-    </div>
-  )
 
   addBlog = (event) => {
     event.preventDefault()
@@ -109,7 +68,7 @@ class App extends React.Component {
       setTimeout(() => {
         this.setState({ error: null })
       }, 5000)
-      return
+      return null
     }
 
     blogService.create(blogObject)
@@ -149,11 +108,15 @@ class App extends React.Component {
     return (
       <div>
         <Notification message={this.state.error} />
-        {this.state.user === null ? this.loginForm() :
+        {this.state.user === null ? <LoginForm username={this.state.username} password={this.state.password} handleSubmit={this.login} handleChange={this.handleLoginFieldChange} /> :
           <div>
             <p>{this.state.user.name} logged in </p><button onClick={() => window.localStorage.removeItem('loggedUser')}>logout</button>
-            {this.blogForm()}
-            {this.blogList()}
+            <BlogForm newBlogAuthor={this.state.newBlogAuthor}
+              newBlogUrl={this.state.newBlogUrl}
+              newBlogTitle={this.state.newBlogTitle}
+              handleChange={this.handleBlogFieldChange}
+              handleSubmit={this.addBlog} />
+            <BlogList blogs={this.state.blogs}/>
           </div>
         }
       </div>
