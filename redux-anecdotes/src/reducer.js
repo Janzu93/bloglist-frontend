@@ -31,6 +31,8 @@ const reducer = (state = initialState, action) => {
     case 'LIKE':
       newState.filter(a => a.id === action.id)[0].votes += 1
       return newState.sort(function (a, b) { return b.votes - a.votes })
+    case 'NEW':
+      return newState.concat(asObject(action.content))
   }
 }
 
